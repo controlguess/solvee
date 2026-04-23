@@ -1,0 +1,15 @@
+{
+  "name": "solvee",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Solvee - AI math solver with Vercel serverless backend",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}
