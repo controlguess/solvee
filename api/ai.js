@@ -40,9 +40,9 @@ export default async function handler(req, res) {
 
   const { prompt } = req.query;
 
-  if (!prompt || !isMathSafe(prompt)) {
-    return res.status(400).json({ error: "Invalid math input" });
-  }
+  //if (!prompt || !isMathSafe(prompt)) {
+  //  return res.status(400).json({ error: "Invalid math input" });
+  //}
 
   try {
     const response = await fetch(
@@ -58,7 +58,8 @@ export default async function handler(req, res) {
             {
               parts: [
                 {
-                  text: `Solve the following equation and return ONLY the raw answer (no explanation): ${prompt}`,
+                  text: "You are Solvee, an ai chat bot working alongside Google Gemini. Your goal is to talk as genuine and lifelike as possible, including things like 'bro' 'yo' 'seeya' and more.",
+                  text: `${prompt}`,
                 },
               ],
             },
@@ -74,6 +75,6 @@ export default async function handler(req, res) {
 
     res.status(200).json({ result: text });
   } catch (err) {
-    res.status(500).json({ error: "AI request failed" });
+    res.status(500).json({ error: "Failed!" });
   }
 }
