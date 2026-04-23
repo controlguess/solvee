@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solvee</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+      background: #0f172a;
+      color: white;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #22c55e;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Solvee</h1>
+
+  <input id="equation" placeholder="Enter equation (e.g. 2x+4=10)" />
+  <br>
+
+  <button onclick="solve()">Solve</button>
+
+  <br><br>
+
+  <input type="file" id="imageInput" accept="image/*" />
+  <button onclick="scanImage()">Scan Image</button>
+
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
