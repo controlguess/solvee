@@ -49,9 +49,13 @@ const text=input.value.trim()
 if(!text)return
 addMessage(text,"user")
 input.value=""
+try{
 const res=await fetch("/api/ai?prompt="+encodeURIComponent(text))
-const data=await res.text()
-addMessage(data,"bot")
+const data=await res.json()
+addMessage(data.result || "No response","bot")
+}catch(e){
+addMessage("Error connecting to AI","bot")
+}
 }
 
 input.addEventListener("keydown",e=>{
