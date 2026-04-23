@@ -25,9 +25,9 @@ function isMathSafe(input) {
 export default async function handler(req, res) {
   const origin = req.headers.origin;
 
-  if (origin !== "https://usesolvee.vercel.app") {
-    return res.status(403).json({ error: "Forbidden" });
-  }
+  //if (origin !== "https://usesolvee.vercel.app") {
+  //  return res.status(403).json({ error: "Forbidden" });
+  //}
 
   const ip =
     req.headers["x-forwarded-for"] ||
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-goog-api-key": process.env.GEMINI_API_KEY, // ✅ secure
+          "X-goog-api-key": "AIzaSyAS12CPzfEj0I6d6sWflVZ9dHp6p4uKBrU",
         },
         body: JSON.stringify({
           contents: [
