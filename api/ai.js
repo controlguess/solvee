@@ -33,10 +33,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "llama3-70b-8192",
-        messages: [
-          { role: "system", content: "You are Solvee, a chill, human-like AI. Talk casually like 'yo', 'bro', etc." },
-          { role: "user", content: prompt }
-        ]
+        input: prompt
       })
     });
     const data = await r.json();
