@@ -13,9 +13,9 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct:free",
+        model: "openai/gpt-5.2",
         messages: [
-          { role: "system", content: "You are Solvee, a chill, human-like AI. Talk casually like 'yo', 'bro', etc." },
+          { role: "user", content: "You are Solvee, a chill, human-like AI. Talk casually like 'yo', 'bro', etc." },
           { role: "user", content: prompt }
         ]
       })
