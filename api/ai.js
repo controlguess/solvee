@@ -1,80 +1,63 @@
-const RATE_LIMIT = 20; // requests
-const WINDOW_MS = 60 * 1000; // 1 minute
-
-let ipStore = new Map();
-
-function rateLimit(ip) {
-  const now = Date.now();
-  const data = ipStore.get(ip) || { count: 0, start: now };
-
-  if (now - data.start > WINDOW_MS) {
-    data.count = 0;
-    data.start = now;
-  }
-
-  data.count++;
-  ipStore.set(ip, data);
-
-  return data.count <= RATE_LIMIT;
-}
-
-function isMathSafe(input) {
-  return /^[0-9xXyYzZ+\-*/^().=\s]+$/.test(input);
-}
-
 export default async function handler(req, res) {
-  const origin = req.headers.origin;
-
-  //if (origin !== "https://usesolvee.vercel.app") {
-  //  return res.status(403).json({ error: "Forbidden" });
-  //}
-
-  const ip =
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    "unknown";
-
-  if (!rateLimit(ip)) {
-    return res.status(429).json({ error: "Too many requests" });
-  }
-
   const { prompt } = req.query;
 
-  //if (!prompt || !isMathSafe(prompt)) {
-  //  return res.status(400).json({ error: "Invalid math input" });
-  //}
+  if (!prompt) {
+    return res.status(400).json({ error: "Missing prompt" });
+  }
+
+  async function askOpenRouter() {
+    const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer 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`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "mistralai/mistral-7b-instruct:free",
+        messages: [
+          { role: "system", content: "You are Solvee, a chill, human-like AI. Talk casually like 'yo', 'bro', etc." },
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    return data.choices?.[0]?.message?.content;
+  }
+
+  async function askGroq() {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer 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`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-70b-8192",
+        messages: [
+          { role: "system", content: "You are Solvee, a chill, human-like AI. Talk casually like 'yo', 'bro', etc." },
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    return data.choices?.[0]?.message?.content;
+  }
 
   try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-goog-api-key": "AIzaSyAS12CPzfEj0I6d6sWflVZ9dHp6p4uKBrU",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: "You are Solvee, an ai chat bot working alongside Google Gemini. Your goal is to talk as genuine and lifelike as possible, including things like 'bro' 'yo' 'seeya' and more.",
-                  text: `${prompt}`,
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    let result = await askOpenRouter();
 
-    const data = await response.json();
+    if (!result) throw new Error("OpenRouter failed");
 
-    const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result";
+    return res.status(200).json({ result });
+  } catch (e) {
+    try {
+      const fallback = await askGroq();
 
-    res.status(200).json({ result: text });
-  } catch (err) {
-    res.status(500).json({ error: "Failed!" });
+      if (!fallback) throw new Error("Groq failed");
+
+      return res.status(200).json({ result: fallback });
+    } catch {
+      return res.status(500).json({ error: "Both providers failed" });
+    }
   }
 }
